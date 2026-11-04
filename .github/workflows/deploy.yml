@@ -16,6 +16,11 @@ jobs:
   deploy:
     name: Publish static site
     runs-on: ubuntu-latest
+    # The token lives in this environment, not in repository secrets. The
+    # environment only accepts main and needs a second person's approval, so
+    # a workflow pushed to another branch, or pushed straight to main, cannot
+    # read the token on its own.
+    environment: production
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,7 +32,7 @@ jobs:
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
           if [ -z "$CF_API_TOKEN_WORKERS" ] || [ -z "$CF_ACCOUNT_ID" ]; then
-            echo "::error::CF_API_TOKEN_WORKERS and/or CF_ACCOUNT_ID are empty. Add them as repository secrets (Settings > Secrets and variables > Actions), or have an organisation owner share the organisation secrets with this repository. See README.md, section Hosting."
+            echo "::error::CF_API_TOKEN_WORKERS and/or CF_ACCOUNT_ID are empty. Add them as secrets of the production environment (Settings > Environments > production). See README.md, section Hosting."
             exit 1
           fi
 

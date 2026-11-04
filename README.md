@@ -37,19 +37,23 @@ as the `kronor.io` zone is in the same account and no DNS record already
 exists for that name. The Worker is also reachable at
 `scxml-visualizer.<account>.workers.dev`.
 
-The workflow needs two GitHub Actions secrets, either on this repository
-(Settings, Secrets and variables, Actions) or shared from the kronor-io
-organisation:
+The workflow runs in the `production` GitHub environment (Settings,
+Environments), which only accepts `main` and requires approval from a
+reviewer other than the person who pushed. Its two secrets live there, not in
+repository or organisation secrets:
 
-- `CF_API_TOKEN_WORKERS`: a Cloudflare API token that can deploy Workers.
-  Create it in the Cloudflare dashboard under My Profile, API Tokens, Create
-  Token, from the "Edit Cloudflare Workers" template, with Account Resources
-  limited to the Kronor account and Zone Resources limited to `kronor.io`.
-  The permissions that matter are Account, Workers Scripts, Edit (which also
-  covers attaching the custom domain) and Zone, Workers Routes, Edit; the
-  KV, R2 and Tail permissions in the template can be removed.
-- `CF_ACCOUNT_ID`: the Cloudflare account id, shown in the dashboard sidebar
-  of any zone and on the Workers overview page.
+- `CF_API_TOKEN_WORKERS`: the Cloudflare account API token
+  `scxml-visualizer-deploy` (Manage account, Account API tokens), with the
+  single permission Account, Workers Scripts, Edit on the Kronor account. That
+  permission also covers attaching the custom domain, so no zone permissions
+  are needed. It does not cover Pages projects. It expires on 2027-11-04.
+- `CF_ACCOUNT_ID`: the Cloudflare account id, shown on the Workers overview
+  page.
+
+Workers Scripts, Edit cannot be narrowed to one Worker or one hostname: whoever
+holds the token can replace any Worker in the account and attach any unused
+hostname in its zones. That is why the token sits behind the environment's
+approval, and why it must not be shared with other repositories.
 
 If either secret is missing the first workflow step fails with a message
 saying so.
