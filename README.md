@@ -22,25 +22,41 @@ The page is plain static files with nothing to build, and it loads no
 third-party resources at runtime, so pasted SCXML never leaves the visitor's
 browser.
 
-### Cloudflare Pages
+### Cloudflare Workers
 
-Every push to `main` deploys to the Cloudflare Pages project
-`scxml-visualizer` via `.github/workflows/deploy.yml`. The workflow copies
-`index.html`, `css/`, `js/` and `vendor/` into `dist/` and publishes that with
-wrangler. It creates the Pages project on the first run if it does not exist.
+Every push to `main` deploys the site as a Cloudflare Worker named
+`scxml-visualizer` via `.github/workflows/deploy.yml`. The Worker has no
+script of its own: `wrangler.toml` declares `dist/` as a static assets
+directory, and the workflow copies `index.html`, `css/`, `js/` and `vendor/`
+into `dist/` before running `wrangler deploy`. The first deploy creates the
+Worker; later ones update it.
 
-It needs two kronor-io organisation secrets, `CF_API_TOKEN_PAGES` and
-`CF_ACCOUNT_ID`, shared with this repository. If they are missing the first
-step fails with a message saying so; an organisation owner shares them under
-Organisation settings, Secrets and variables, Actions, repository access.
+`wrangler.toml` also declares `scxml.kronor.io` as a custom domain. On the
+first deploy Cloudflare creates the DNS record and certificate for it, as long
+as the `kronor.io` zone is in the same account and no DNS record already
+exists for that name. The Worker is also reachable at
+`scxml-visualizer.<account>.workers.dev`.
 
-The site is served at `https://scxml-visualizer.pages.dev`. To serve it at
-`scxml.kronor.io`, open the Pages project in the Cloudflare dashboard, go to
-Custom domains, and add `scxml.kronor.io`. The `kronor.io` zone is in the same
-account, so Cloudflare creates the CNAME record and certificate itself. If the
-team prefers the DNS record in Terraform, add a CNAME from `scxml` to
-`scxml-visualizer.pages.dev` in the kronor repo's `kronor-prod/external` stack
-and then add the custom domain in the Pages project.
+The workflow needs two GitHub Actions secrets, either on this repository
+(Settings, Secrets and variables, Actions) or shared from the kronor-io
+organisation:
+
+- `CF_API_TOKEN_WORKERS`: a Cloudflare API token that can deploy Workers.
+  Create it in the Cloudflare dashboard under My Profile, API Tokens, Create
+  Token, from the "Edit Cloudflare Workers" template, with Account Resources
+  limited to the Kronor account and Zone Resources limited to `kronor.io`.
+  The permissions that matter are Account, Workers Scripts, Edit (which also
+  covers attaching the custom domain) and Zone, Workers Routes, Edit; the
+  KV, R2 and Tail permissions in the template can be removed.
+- `CF_ACCOUNT_ID`: the Cloudflare account id, shown in the dashboard sidebar
+  of any zone and on the Workers overview page.
+
+If either secret is missing the first workflow step fails with a message
+saying so.
+
+To deploy by hand instead, assemble `dist/` as the workflow does and run
+`npx wrangler deploy` with `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
+set.
 
 ## Layout of the code
 

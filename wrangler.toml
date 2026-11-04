@@ -1,0 +1,19 @@
+# Cloudflare Workers config: an assets-only Worker, so no script file.
+# Deployed by .github/workflows/deploy.yml with `wrangler deploy`.
+name = "scxml-visualizer"
+compatibility_date = "2026-11-04"
+
+# Keep the *.workers.dev URL as a fallback next to the custom domain.
+workers_dev = true
+
+[assets]
+directory = "./dist"
+html_handling = "auto-trailing-slash"
+not_found_handling = "none"
+
+# Cloudflare creates the DNS record and certificate for this hostname on the
+# first deploy. The kronor.io zone must be in the same account as the Worker,
+# and no DNS record may already exist for the name.
+[[routes]]
+pattern = "scxml.kronor.io"
+custom_domain = true

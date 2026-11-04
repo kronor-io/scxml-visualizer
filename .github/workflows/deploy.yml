@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare Workers
 
 on:
   push:
@@ -12,9 +12,6 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: true
 
-env:
-  PROJECT_NAME: scxml-visualizer
-
 jobs:
   deploy:
     name: Publish static site
@@ -26,15 +23,16 @@ jobs:
 
       - name: Check Cloudflare credentials
         env:
-          CF_API_TOKEN_PAGES: ${{ secrets.CF_API_TOKEN_PAGES }}
+          CF_API_TOKEN_WORKERS: ${{ secrets.CF_API_TOKEN_WORKERS }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
         run: |
-          if [ -z "$CF_API_TOKEN_PAGES" ] || [ -z "$CF_ACCOUNT_ID" ]; then
-            echo "::error::CF_API_TOKEN_PAGES and/or CF_ACCOUNT_ID are empty. They are kronor-io organisation secrets; an org owner must share them with this repository (Organisation settings > Secrets and variables > Actions > repository access)."
+          if [ -z "$CF_API_TOKEN_WORKERS" ] || [ -z "$CF_ACCOUNT_ID" ]; then
+            echo "::error::CF_API_TOKEN_WORKERS and/or CF_ACCOUNT_ID are empty. Add them as repository secrets (Settings > Secrets and variables > Actions), or have an organisation owner share the organisation secrets with this repository. See README.md, section Hosting."
             exit 1
           fi
 
       # Only the files the page needs. README, serve.py and tooling stay out.
+      # wrangler.toml points at dist/ as the assets directory.
       - name: Assemble site
         run: |
           mkdir -p dist
@@ -45,35 +43,23 @@ jobs:
         with:
           node-version: "22"
 
-      # Wrangler cannot create a project interactively in CI, but it can when
-      # told the production branch. Create it on first run, skip afterwards.
-      - name: Ensure Pages project exists
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN_PAGES }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-          WRANGLER_SEND_METRICS: "false"
-        run: |
-          if npx --yes wrangler@4 pages project list | grep -qw "$PROJECT_NAME"; then
-            echo "Project $PROJECT_NAME exists"
-          else
-            npx --yes wrangler@4 pages project create "$PROJECT_NAME" --production-branch main
-          fi
-
-      - name: Publish to Cloudflare Pages
+      # Creates the Worker on the first run, uploads the assets, and attaches
+      # the custom domain declared in wrangler.toml.
+      - name: Publish to Cloudflare Workers
         id: deploy
         uses: cloudflare/wrangler-action@953926a2e2182532811c01a25e53647d93bf07c0 # v4.1.3
         with:
-          apiToken: ${{ secrets.CF_API_TOKEN_PAGES }}
+          apiToken: ${{ secrets.CF_API_TOKEN_WORKERS }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=${{ env.PROJECT_NAME }} --branch=main --commit-dirty=true
+          command: deploy
 
       - name: Summary
         env:
           DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
         run: |
           {
-            echo "Deployed \`$PROJECT_NAME\`"
+            echo "Deployed the \`scxml-visualizer\` Worker"
             echo ""
-            echo "- preview: $DEPLOYMENT_URL"
-            echo "- production: https://$PROJECT_NAME.pages.dev (and the custom domain, once attached)"
+            echo "- custom domain: https://scxml.kronor.io"
+            echo "- workers.dev: $DEPLOYMENT_URL"
           } >> "$GITHUB_STEP_SUMMARY"
