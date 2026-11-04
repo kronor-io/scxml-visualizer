@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SCXML Visualizer</title>
+  <meta name="description" content="Paste SCXML and see the statechart. Everything runs in your browser; nothing is uploaded.">
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    try {
+      var t = localStorage.getItem('scxml-visualizer-theme');
+      if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <h1>SCXML Visualizer</h1>
+      <span class="brand-note">Runs entirely in your browser. Nothing is uploaded.</span>
+    </div>
+    <div class="toolbar">
+      <label class="control">
+        <span>Direction</span>
+        <select id="direction">
+          <option value="DOWN">Top to bottom</option>
+          <option value="RIGHT">Left to right</option>
+        </select>
+      </label>
+      <label class="control">
+        <span>Example</span>
+        <select id="sample">
+          <option value="">Choose…</option>
+        </select>
+      </label>
+      <label class="control">
+        <span>Theme</span>
+        <select id="theme">
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+      <button id="fit" type="button" title="Fit diagram to view (or double-click the diagram)">Fit</button>
+      <button id="clear" type="button">Clear</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <section class="editor-pane">
+      <div class="pane-header">
+        <span>SCXML</span>
+        <span id="stats" class="stats"></span>
+      </div>
+      <textarea id="source" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+        placeholder="Paste your SCXML here…"></textarea>
+    </section>
+
+    <div class="splitter" id="splitter" role="separator" aria-orientation="vertical" aria-label="Resize panes"></div>
+
+    <section class="diagram-pane">
+      <div id="messages" class="messages" aria-live="polite"></div>
+      <svg id="diagram" class="diagram" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Statechart diagram"></svg>
+      <div id="empty" class="empty">Paste SCXML on the left, or pick an example above.</div>
+      <div class="legend">
+        <span><i class="lg-initial"></i>initial</span>
+        <span><i class="lg-final"></i>final</span>
+        <span><i class="lg-history">H</i>history</span>
+        <span><i class="lg-region"></i>parallel region</span>
+      </div>
+    </section>
+  </main>
+
+  <script src="vendor/elk.bundled.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/samples.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

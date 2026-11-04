@@ -1,0 +1,523 @@
+:root {
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --border: #d9dde3;
+  --text: #1f2430;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --error-bg: #fdecec;
+  --error-fg: #9f1d1d;
+  --error-border: #f3b4b4;
+  --warn-bg: #fff7e6;
+  --warn-fg: #8a5a00;
+  --warn-border: #f5d58a;
+
+  --node-fill: #ffffff;
+  --node-stroke: #475569;
+  --compound-fill: #f8fafc;
+  --edge: #334155;
+  --edge-internal: #9ca3af;
+  --label-bg: #ffffff;
+  --region-fill: rgba(255, 255, 255, 0.55);
+  --grid: #d4d8de;
+  --legend-bg: rgba(255, 255, 255, 0.85);
+  color-scheme: light;
+
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  color: var(--text);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --border: #2b313d;
+  --text: #e6e8ee;
+  --muted: #98a2b3;
+  --accent: #60a5fa;
+  --accent-soft: #1e3a8a;
+  --error-bg: #3a1618;
+  --error-fg: #fca5a5;
+  --error-border: #7f1d1d;
+  --warn-bg: #362a0b;
+  --warn-fg: #fcd34d;
+  --warn-border: #78500a;
+
+  --node-fill: #1e232e;
+  --node-stroke: #aab4c3;
+  --compound-fill: #181c25;
+  --region-fill: rgba(255, 255, 255, 0.04);
+  --edge: #c3cbd8;
+  --edge-internal: #6b7280;
+  --label-bg: #171a21;
+  --grid: #2b313d;
+  --legend-bg: rgba(23, 26, 33, 0.88);
+  color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f1115;
+  --panel: #171a21;
+  --border: #2b313d;
+  --text: #e6e8ee;
+  --muted: #98a2b3;
+  --accent: #60a5fa;
+  --accent-soft: #1e3a8a;
+  --error-bg: #3a1618;
+  --error-fg: #fca5a5;
+  --error-border: #7f1d1d;
+  --warn-bg: #362a0b;
+  --warn-fg: #fcd34d;
+  --warn-border: #78500a;
+
+  --node-fill: #1e232e;
+  --node-stroke: #aab4c3;
+  --compound-fill: #181c25;
+  --region-fill: rgba(255, 255, 255, 0.04);
+  --edge: #c3cbd8;
+  --edge-internal: #6b7280;
+  --label-bg: #171a21;
+  --grid: #2b313d;
+  --legend-bg: rgba(23, 26, 33, 0.88);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.brand-mark {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--accent);
+  transform: translateY(1px);
+}
+
+.brand h1 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.brand-note {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+select, button {
+  font: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.workspace {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.editor-pane {
+  display: flex;
+  flex-direction: column;
+  width: 38%;
+  min-width: 260px;
+  max-width: 70%;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+}
+
+.pane-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.stats {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+#source {
+  flex: 1;
+  width: 100%;
+  resize: none;
+  border: 0;
+  outline: none;
+  padding: 12px;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--panel);
+  tab-size: 2;
+}
+
+.splitter {
+  width: 6px;
+  cursor: col-resize;
+  background: transparent;
+  margin-left: -3px;
+  margin-right: -3px;
+  z-index: 2;
+}
+
+.splitter:hover,
+.splitter.active {
+  background: var(--accent-soft);
+}
+
+.diagram-pane {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.messages {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.message {
+  pointer-events: auto;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  border: 1px solid;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.message-error {
+  background: var(--error-bg);
+  color: var(--error-fg);
+  border-color: var(--error-border);
+}
+
+.message-warning {
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+  border-color: var(--warn-border);
+}
+
+.message code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+.diagram {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  background:
+    radial-gradient(circle, var(--grid) 1px, transparent 1px) 0 0 / 22px 22px,
+    var(--bg);
+  touch-action: none;
+  user-select: none;
+}
+
+.diagram.dragging {
+  cursor: grabbing;
+}
+
+.diagram.stale {
+  opacity: 0.45;
+}
+
+.empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  pointer-events: none;
+  font-size: 15px;
+}
+
+.empty.hidden {
+  display: none;
+}
+
+.legend {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--legend-bg);
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  pointer-events: none;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend i {
+  display: inline-block;
+  font-style: normal;
+}
+
+.lg-initial {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--edge);
+}
+
+.lg-final {
+  width: 16px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid var(--edge);
+  box-shadow: inset 0 0 0 1.5px var(--panel), inset 0 0 0 2.5px var(--edge);
+}
+
+.lg-history {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--edge);
+  font-size: 9px;
+  line-height: 11px;
+  text-align: center;
+  color: var(--edge);
+}
+
+.lg-region {
+  width: 16px;
+  height: 11px;
+  border: 1.5px solid var(--edge);
+  border-radius: 2px;
+  background: linear-gradient(to bottom, var(--edge) 0 1px, transparent 1px) 50% 0 / 1.5px 3px repeat-y;
+}
+
+/* ---- SVG diagram styles ---- */
+
+.node text {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  pointer-events: none;
+}
+
+.state-box {
+  fill: var(--node-fill);
+  stroke: var(--node-stroke);
+  stroke-width: 1.4;
+}
+
+.state-title,
+.compound-title {
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--text);
+}
+
+.detail-sep {
+  stroke: var(--node-stroke);
+  stroke-width: 0.8;
+  opacity: 0.6;
+}
+
+.detail-head {
+  font-size: 11px;
+  fill: var(--muted);
+  font-style: italic;
+}
+
+.detail-item {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  fill: var(--text);
+}
+
+.compound-box {
+  fill: var(--compound-fill);
+  stroke: var(--node-stroke);
+  stroke-width: 1.4;
+}
+
+.parallel-box {
+  fill: var(--compound-fill);
+  stroke: var(--node-stroke);
+  stroke-width: 1.4;
+}
+
+.region-box {
+  fill: var(--region-fill);
+  stroke: var(--node-stroke);
+  stroke-width: 1.2;
+  stroke-dasharray: 5 4;
+}
+
+.parallel-tag {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  fill: var(--muted);
+}
+
+.initial-dot {
+  fill: var(--edge);
+}
+
+.final-box {
+  fill: var(--node-fill);
+  stroke: var(--node-stroke);
+  stroke-width: 1.4;
+}
+
+.final-box.inner {
+  fill: none;
+  stroke-width: 1.2;
+}
+
+.partition {
+  stroke: var(--node-stroke);
+  stroke-width: 1.2;
+  stroke-dasharray: 5 4;
+}
+
+.history-circle {
+  fill: var(--node-fill);
+  stroke: var(--node-stroke);
+  stroke-width: 1.4;
+}
+
+.history-label {
+  font-size: 11px;
+  font-weight: 600;
+  fill: var(--text);
+}
+
+.edge-path {
+  fill: none;
+  stroke: var(--edge);
+  stroke-width: 1.4;
+}
+
+.edge-internal .edge-path {
+  stroke-dasharray: 4 3;
+}
+
+.arrow-head {
+  fill: var(--edge);
+}
+
+.edge-label-bg {
+  fill: var(--label-bg);
+  stroke: var(--border);
+  stroke-width: 0.8;
+}
+
+.edge-label {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 11px;
+  fill: var(--text);
+  pointer-events: none;
+}
+
+.node.highlight .state-box,
+.node.highlight .compound-box,
+.node.highlight .parallel-box {
+  stroke: var(--accent);
+  stroke-width: 2.2;
+}
+
+@media (max-width: 720px) {
+  .workspace {
+    flex-direction: column;
+  }
+  .editor-pane {
+    width: 100% !important;
+    max-width: none;
+    height: 40%;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .splitter {
+    display: none;
+  }
+  .brand-note {
+    display: none;
+  }
+}
